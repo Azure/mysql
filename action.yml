@@ -1,0 +1,17 @@
+name: 'Azure MYSQL Deploy'
+description: 'Deploy to Azure MySQL database using SQL script files'
+inputs:
+  server-name: 
+    description: 'Server name of Azure DB for Mysql. Example: fabrikam.mysql.database.azure.com. When you connect using Mysql Workbench, this is the same value that is used for Hostname in Parameters'
+    required: true
+  connection-string:
+    description: ''
+    required: true
+  sql-file:
+    description: 'Path to SQL script file. *.sql or a folder to deploy'
+    required: true
+  arguments:
+    description: 'Additional options supported by mysql simple SQL shell. These options will be applied when executing the given file on the Azure DB for Mysql.'
+runs:
+  using: 'node12'
+  main: 'lib/main.js'
