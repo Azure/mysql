@@ -115,7 +115,7 @@ export default class AzureMySqlActionHelper {
                 if (!!mySqlServerPath) {
                     let mySqlClientExecutablePath = path.join(mySqlServerPath, 'bin', 'mysql.exe');
                     if (fs.existsSync(mySqlClientExecutablePath)) {
-                        core.debug(`MySQL client executable found at location ${mySqlClientExecutablePath}`);
+                        core.debug(`MySQL client executable found at path ${mySqlClientExecutablePath}`);
                         return mySqlClientExecutablePath;
                     }
                 }
@@ -127,7 +127,7 @@ export default class AzureMySqlActionHelper {
 
     private static async _getMySqlClientOnLinux(): Promise<string> {
         let  mySqlClientPath = await io.which('mysql', true);
-        core.debug(`MySql client found at path ${mySqlClientPath}`);
+        core.debug(`MySQL client found at path ${mySqlClientPath}`);
         return mySqlClientPath;
     }
 }

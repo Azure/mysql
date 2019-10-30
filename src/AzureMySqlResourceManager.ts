@@ -193,6 +193,7 @@ export default class AzureMySqlResourceManager {
             uri: this._restClient.getRequestUri('//subscriptions/{subscriptionId}/providers/Microsoft.DBforMySQL/servers', {}, [], '2017-12-01')
         }
 
+        core.debug(`Get MySQL server '${serverName}' details`);
         try {
             let httpResponse = await this._restClient.beginRequest(httpRequest);
             if (httpResponse.statusCode !== 200) {
@@ -205,6 +206,8 @@ export default class AzureMySqlResourceManager {
                 if (!this._resource) {
                     throw new Error(`Unable to get details of MySQL server ${serverName}. MySql server '${serverName}' was not found in the subscription.`);
                 }
+
+                core.debug(JSON.stringify(this._resource));
             }
             else {
                 throw new Error(`Unable to get details of MySQL server ${serverName}. No MySQL servers were found in the subscription.`);

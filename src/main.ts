@@ -1,4 +1,5 @@
 import * as core from '@actions/core';
+import * as crypto from 'crypto';
 import * as path from 'path';
 import { AuthorizerFactory } from 'azure-actions-webclient/AuthorizerFactory';
 
@@ -8,9 +9,17 @@ import FirewallManager from './FirewallManager';
 import AzureMySqlResourceManager from './AzureMySqlResourceManager';
 import MySqlConnectionStringBuilder from './MySqlConnectionStringBuilder';
 
+let userAgentPrefix = !!process.env.AZURE_HTTP_USER_AGENT ? `${process.env.AZURE_HTTP_USER_AGENT}` : "";
+
 export async function run() {
     let firewallManager;
     try {
+        // Set user agent variable
+        let usrAgentRepo = crypto.createHash('sha256').update(`${process.env.GITHUB_REPOSITORY}`).digest('hex');
+        let actionName = 'AzureMySqlAction';
+        let userAgentString = (!!userAgentPrefix ? `${userAgentPrefix}+` : '') + `GITHUBACTIONS_${actionName}_${usrAgentRepo}`;
+        core.exportVariable('AZURE_HTTP_USER_AGENT', userAgentString);
+
         let inputs = getInputs();
         let azureMySqlAction = new AzureMySqlAction(inputs);
         let azureResourceAuthorizer = await AuthorizerFactory.getAuthorizer();
@@ -27,6 +36,9 @@ export async function run() {
         if (firewallManager) {
             await firewallManager.removeFirewallRule();
         }
+
+        // Reset AZURE_HTTP_USER_AGENT
+        core.exportVariable('AZURE_HTTP_USER_AGENT', userAgentPrefix);
     }
 }
 
