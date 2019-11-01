@@ -9,6 +9,39 @@ import winreg from 'winreg';
 const IS_WINDOWS = process.platform === 'win32';
 
 export default class AzureMySqlActionHelper {  
+    
+    public static async getMySqlClientPath(): Promise<string> {
+        core.debug(`Getting location of MySql client on ${os.hostname()}`);
+        if (IS_WINDOWS) {
+            return this._getMySqlClientOnWindows();
+        }
+        else {
+            return this._getMySqlClientOnLinux();
+        }
+    }
+
+    public static resolveFilePath(filePathPattern: string): string {
+        let filePath = filePathPattern;
+        if (glob.hasMagic(filePathPattern)) {
+            let matchedFiles: string[] = glob.sync(filePathPattern);
+            if (matchedFiles.length === 0) {
+                throw new Error(`No files found matching pattern ${filePathPattern}`);
+            }
+
+            if (matchedFiles.length > 1) {
+                throw new Error(`Muliple files found matching pattern ${filePathPattern}`);
+            }
+
+            filePath = matchedFiles[0];
+        }
+
+        if (!fs.existsSync(filePath)) {
+            throw new Error(`Unable to find file at location: ${filePath}`);
+        }
+        
+        return filePath;
+    }
+
     public static getRegistrySubKeys(path: string): Promise<winreg.Registry[]> {
         return new Promise((resolve) => {
             core.debug(`Getting sub-keys at registry path: HKLM:${path}`);
@@ -44,38 +77,6 @@ export default class AzureMySqlActionHelper {
                 resolve(!!error ? false : result);
             })
         });
-    }
-
-    public static async getMySqlClientPath(): Promise<string> {
-        core.debug(`Getting location of MySql client on ${os.hostname()}`);
-        if (IS_WINDOWS) {
-            return this._getMySqlClientOnWindows();
-        }
-        else {
-            return this._getMySqlClientOnLinux();
-        }
-    }
-
-    public static resolveFilePath(filePathPattern: string): string {
-        let filePath = filePathPattern;
-        if (glob.hasMagic(filePathPattern)) {
-            let matchedFiles: string[] = glob.sync(filePathPattern);
-            if (matchedFiles.length === 0) {
-                throw new Error(`No files found matching pattern ${filePathPattern}`);
-            }
-
-            if (matchedFiles.length > 1) {
-                throw new Error(`Muliple files found matching pattern ${filePathPattern}`);
-            }
-
-            filePath = matchedFiles[0];
-        }
-
-        if (!fs.existsSync(filePath)) {
-            throw new Error(`Unable to find file at location: ${filePath}`);
-        }
-        
-        return filePath;
     }
 
     private static async _getMySqlClientOnWindows(): Promise<string> {
