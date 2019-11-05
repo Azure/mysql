@@ -19,7 +19,7 @@ export default class AzureMySqlAction {
         core.debug('Begin executing action...');
         
         let mySqlClientPath = await AzureMySqlActionHelper.getMySqlClientPath();
-        await exec.exec(`"${mySqlClientPath}" -h ${this._inputs.serverName} -D ${this._inputs.connectionString.database} -u ${this._inputs.connectionString.userId} --password='${this._inputs.connectionString.password}' ${this._inputs.additionalArguments} -e "source ${this._inputs.sqlFile}"`)
+        await exec.exec(`"${mySqlClientPath}" -h ${this._inputs.serverName} -D ${this._inputs.connectionString.database} -u ${this._inputs.connectionString.userId} ${this._inputs.additionalArguments} -e "source ${this._inputs.sqlFile}"`, [`--password=${this._inputs.connectionString.password}`]);
         
         console.log('Successfully executed sql file on target database');
     }
