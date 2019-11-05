@@ -8,7 +8,7 @@ inputs:
     description: 'The connection string, including authentication information, for the Azure MySQL Server.'
     required: true
   sql-file:
-    description: 'Path to SQL script file. *.sql or a folder to deploy'
+    description: 'Path to SQL script file, *.sql to deploy'
     required: true
   arguments:
     description: 'Additional options supported by mysql simple SQL shell. These options will be applied when executing the given file on the Azure DB for Mysql.'
