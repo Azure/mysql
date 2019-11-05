@@ -45,7 +45,7 @@ export default class FirewallManager {
         try {
             core.debug(`Validating if client has access to MySql Server '${serverName}'.`);
             core.debug(`"${mySqlClientPath}" -h ${serverName} -u "${connectionString.userId}" -e "show databases"`);
-            await exec.exec(`"${mySqlClientPath}" -h ${serverName} -u "${connectionString.userId}" --password="${connectionString.password}" -e "show databases"`, [], {
+            await exec.exec(`"${mySqlClientPath}" -h ${serverName} -u "${connectionString.userId}" -e "show databases"`, [`--password=${connectionString.password}`], {
                 silent: true,
                 listeners: {
                     stderr: (data: Buffer) => mySqlError += data.toString()
