@@ -75,7 +75,7 @@ jobs:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
     - uses: azure/mysql-action@v1
       with:
-        server-name: REPLACE_THIS_WITH_YOUR_SQL_SERVER_NAME
+        server-name: REPLACE_THIS_WITH_YOUR_MYSQL_SERVER_NAME
         connection-string: ${{ secrets.AZURE_MYSQL_CONNECTION_STRING }}
         sql-file: './sqlFile.sql'
  ```
