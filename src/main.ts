@@ -53,6 +53,11 @@ function getInputs(): IActionInputs {
         throw new Error(`Invalid sql file path provided as input ${sqlFile}`);
     }
 
+    // validate that the sever name input matches the connection string server name
+    if (serverName.toLowerCase() !== connectionStringBuilder.server.toLowerCase()) {
+        throw new Error(`Server name mismatch error. The server name provided in the action input does not match the server name provided in the connection string.`);
+    }
+
     let additionalArguments = core.getInput('arguments');
     
     return {
