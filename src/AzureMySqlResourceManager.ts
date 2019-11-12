@@ -202,7 +202,7 @@ export default class AzureMySqlResourceManager {
 
             let sqlServers = httpResponse.body && httpResponse.body.value as AzureMySqlServer[];
             if (sqlServers && sqlServers.length > 0) {
-                this._resource = sqlServers.filter((sqlResource) => sqlResource.name === serverName)[0];
+                this._resource = sqlServers.filter((sqlResource) => sqlResource.name.toLowerCase() === serverName.toLowerCase())[0];
                 if (!this._resource) {
                     throw new Error(`Unable to get details of MySQL server ${serverName}. MySql server '${serverName}' was not found in the subscription.`);
                 }
