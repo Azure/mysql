@@ -8,6 +8,7 @@ import AzureMySqlAction, { IActionInputs } from "./AzureMySqlAction";
 import FirewallManager from './FirewallManager';
 import AzureMySqlResourceManager from './AzureMySqlResourceManager';
 import MySqlConnectionStringBuilder from './MySqlConnectionStringBuilder';
+import MySqlUtils from './MySqlUtils';
 
 let userAgentPrefix = !!process.env.AZURE_HTTP_USER_AGENT ? `${process.env.AZURE_HTTP_USER_AGENT}` : "";
 
@@ -22,11 +23,13 @@ export async function run() {
 
         let inputs = getInputs();
         let azureMySqlAction = new AzureMySqlAction(inputs);
-        let azureResourceAuthorizer = await AuthorizerFactory.getAuthorizer();
-        let azureMySqlResourceManager = await AzureMySqlResourceManager.getResourceManager(inputs.serverName, azureResourceAuthorizer);
-        firewallManager = new FirewallManager(azureMySqlResourceManager);
 
-        await firewallManager.addFirewallRule(inputs.serverName, inputs.connectionString);
+        if(!await MySqlUtils.connectsToDB(inputs.serverName, inputs.connectionString)) {
+            let azureResourceAuthorizer = await AuthorizerFactory.getAuthorizer();
+            let azureMySqlResourceManager = await AzureMySqlResourceManager.getResourceManager(inputs.serverName, azureResourceAuthorizer);
+            firewallManager = new FirewallManager(azureMySqlResourceManager);
+            await firewallManager.addFirewallRule(inputs.serverName, inputs.connectionString);
+        }
         await azureMySqlAction.execute();
     }
     catch(error) {

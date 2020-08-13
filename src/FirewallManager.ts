@@ -2,8 +2,8 @@ import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import AzureMySqlActionHelper from "./AzureMySqlActionHelper";
 import AzureMySqlResourceManager from './AzureMySqlResourceManager';
+import Constants from './Constants';
 
-const ipv4MatchPattern = /\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/;
 
 export default class FirewallManager {
     constructor(azureMySqlResourceManager: AzureMySqlResourceManager) {
@@ -55,7 +55,7 @@ export default class FirewallManager {
         catch (error) {
             core.debug(mySqlError);
             
-            let ipAddresses = mySqlError.match(ipv4MatchPattern);
+            let ipAddresses = mySqlError.match(Constants.ipv4MatchPattern);
             if (!!ipAddresses) {
                 ipAddress = ipAddresses[0];      
             }
