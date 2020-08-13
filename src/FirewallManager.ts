@@ -3,6 +3,7 @@ import * as exec from '@actions/exec';
 import AzureMySqlActionHelper from "./AzureMySqlActionHelper";
 import AzureMySqlResourceManager from './AzureMySqlResourceManager';
 import Constants from './Constants';
+import MySqlUtils from './MySqlUtils';
 
 
 export default class FirewallManager {
@@ -11,7 +12,7 @@ export default class FirewallManager {
     }
 
     public async addFirewallRule(serverName: string, connectionString: any): Promise<void> {
-        let ipAddress = await this._detectIPAddress(serverName, connectionString);
+        let ipAddress = await MySqlUtils.detectIPAddress(serverName, connectionString);
         if (!ipAddress) {
             core.debug(`Client has access to MySql server. Skip adding firewall exception.`);
             return;
@@ -34,38 +35,6 @@ export default class FirewallManager {
         else {
             core.debug('No firewall exception was added.')
         }
-    }
-
-    private async _detectIPAddress(serverName: string, connectionString: any): Promise<string> {
-        let mySqlClientPath = await AzureMySqlActionHelper.getMySqlClientPath();
-
-        let ipAddress = '';
-        let mySqlError = '';
-        
-        try {
-            core.debug(`Validating if client has access to MySql Server '${serverName}'.`);
-            core.debug(`"${mySqlClientPath}" -h ${serverName} -u "${connectionString.userId}" -e "show databases"`);
-            await exec.exec(`"${mySqlClientPath}" -h ${serverName} -u "${connectionString.userId}" -e "show databases"`, [`--password=${connectionString.password}`], {
-                silent: true,
-                listeners: {
-                    stderr: (data: Buffer) => mySqlError += data.toString()
-                }
-            });
-        }
-        catch (error) {
-            core.debug(mySqlError);
-            
-            let ipAddresses = mySqlError.match(Constants.ipv4MatchPattern);
-            if (!!ipAddresses) {
-                ipAddress = ipAddresses[0];      
-            }
-            else {
-                throw new Error(`Failed to add firewall rule. Unable to detect client IP Address. ${mySqlError} ${error}`)
-            }
-        }
-
-        //ipAddress will be an empty string if client has access to SQL server
-        return ipAddress;
     }
 
     private _firewallRule: any; // assign proper type

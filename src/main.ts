@@ -24,7 +24,7 @@ export async function run() {
         let inputs = getInputs();
         let azureMySqlAction = new AzureMySqlAction(inputs);
 
-        if(!await MySqlUtils.connectsToDB(inputs.serverName, inputs.connectionString)) {
+        if(await MySqlUtils.detectIPAddress(inputs.serverName, inputs.connectionString)) {
             let azureResourceAuthorizer = await AuthorizerFactory.getAuthorizer();
             let azureMySqlResourceManager = await AzureMySqlResourceManager.getResourceManager(inputs.serverName, azureResourceAuthorizer);
             firewallManager = new FirewallManager(azureMySqlResourceManager);
