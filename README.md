@@ -4,13 +4,13 @@ With the Azure MySQL Action for GitHub, you can automate your workflow to deploy
 
 Get started today with a [free Azure account](https://azure.com/free/open-source)!
 
-This repository contains GitHub Action for [Azure database for MySQL server](https://github.com/Azure/mysql-action) to deploy . 
+This repository contains GitHub Action for [Azure database for MySQL server](https://github.com/Azure/mysql) to deploy . 
 
 The action uses Connection String for authentication and SQL scripts to deploy to your MySQL database.
 
 If you are looking for more Github Actions to deploy code or a customized image into an Azure Webapp or a Kubernetes service, consider using [Azure Actions](https://github.com/Azure/actions).
 
-The definition of this Github Action is in [action.yml](https://github.com/Azure/mysql-action/blob/master/action.yml).
+The definition of this Github Action is in [action.yml](https://github.com/Azure/mysql/blob/master/action.yml).
 
 # End-to-End Sample Workflow
 
