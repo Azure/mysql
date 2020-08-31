@@ -73,7 +73,7 @@ jobs:
     - uses: azure/login@v1
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
-    - uses: azure/mysql-action@v1
+    - uses: azure/mysql@v1
       with:
         server-name: REPLACE_THIS_WITH_YOUR_MYSQL_SERVER_NAME
         connection-string: ${{ secrets.AZURE_MYSQL_CONNECTION_STRING }}
