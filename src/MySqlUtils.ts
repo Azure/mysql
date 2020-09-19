@@ -6,10 +6,8 @@ import Constants from "./Constants";
 export default class MySqlUtils {
     static async detectIPAddress(serverName: string, connectionString: any): Promise<string> {
         let mySqlClientPath = await AzureMySqlActionHelper.getMySqlClientPath();
-
         let ipAddress = '';
         let mySqlError = '';
-        
         try {
             core.debug(`Validating if client has access to MySql Server '${serverName}'.`);
             core.debug(`"${mySqlClientPath}" -h ${serverName} -u "${connectionString.userId}" -e "show databases"`);
@@ -31,10 +29,8 @@ export default class MySqlUtils {
                 throw new Error(`Unable to detect client IP Address. ${mySqlError} ${error}`)
             }
         }
-
         //ipAddress will be an empty string if client has access to SQL server
         return ipAddress;
     }
-
 
 }

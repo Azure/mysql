@@ -23,12 +23,12 @@ export async function run() {
 
         let inputs = getInputs();
         let azureMySqlAction = new AzureMySqlAction(inputs);
-
-        if(await MySqlUtils.detectIPAddress(inputs.serverName, inputs.connectionString)) {
+        const runnerIPAddress = await MySqlUtils.detectIPAddress(inputs.serverName, inputs.connectionString);
+        if(runnerIPAddress) {
             let azureResourceAuthorizer = await AuthorizerFactory.getAuthorizer();
             let azureMySqlResourceManager = await AzureMySqlResourceManager.getResourceManager(inputs.serverName, azureResourceAuthorizer);
             firewallManager = new FirewallManager(azureMySqlResourceManager);
-            await firewallManager.addFirewallRule(inputs.serverName, inputs.connectionString);
+            await firewallManager.addFirewallRule(runnerIPAddress);
         }
         await azureMySqlAction.execute();
     }

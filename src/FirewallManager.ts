@@ -1,28 +1,19 @@
 import * as core from '@actions/core';
-import * as exec from '@actions/exec';
-import AzureMySqlActionHelper from "./AzureMySqlActionHelper";
 import AzureMySqlResourceManager from './AzureMySqlResourceManager';
-import Constants from './Constants';
-import MySqlUtils from './MySqlUtils';
-
 
 export default class FirewallManager {
     constructor(azureMySqlResourceManager: AzureMySqlResourceManager) {
         this._resourceManager = azureMySqlResourceManager;
     }
 
-    public async addFirewallRule(serverName: string, connectionString: any): Promise<void> {
-        let ipAddress = await MySqlUtils.detectIPAddress(serverName, connectionString);
+    public async addFirewallRule(ipAddress: string): Promise<void> {
         if (!ipAddress) {
             core.debug(`Client has access to MySql server. Skip adding firewall exception.`);
             return;
         }
-        
         console.log(`Client does not have access to MySql server. Adding firewall exception for client's IP address.`)
-        
         this._firewallRule = await this._resourceManager.addFirewallRule(ipAddress, ipAddress);
         core.debug(JSON.stringify(this._firewallRule));
-
         console.log(`Successfully added firewall rule ${this._firewallRule.name}.`);
     }
 
