@@ -15,7 +15,6 @@ jest.mock('azure-actions-webclient/AuthorizerFactory');
 jest.mock('../src/AzureMySqlAction');
 jest.mock('../src/FirewallManager');
 jest.mock('../src/AzureMySqlResourceManager');
-jest.mock('../src/MysqlUtils');
 
 jest.mock('../src/MySqlConnectionStringBuilder', () => {
     return jest.fn().mockImplementation(() => {
