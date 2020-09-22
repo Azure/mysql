@@ -28,7 +28,7 @@ Alternatively, if enough permissions are not granted on the service principal or
 
 ## Create an Azure database for MySQL server and deploy using GitHub Actions
 1. Follow the tutorial [Azure Database for MySQL server Quickstart](https://docs.microsoft.com/en-us/azure/mysql/quickstart-create-mysql-server-database-using-azure-portal)
-2. Copy the MySQL-on-Azure.yml template from [starter templates](https://github.com/Azure/actions-workflow-samples/tree/master/Database) and paste the template contents into `.github/workflows/` within your project repository as workflow.yml.
+2. Pick the MySQL-on-Azure.yml template from https://github.com/Azure/actions-workflow-samples and place the template into `.github/workflows/` within your project repository.
 3. Change `server-name` to your Azure MySQL Server name.
 4. Commit and push your project to GitHub repository, you should see a new GitHub Action initiated in **Actions** tab.
 
