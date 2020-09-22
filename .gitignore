@@ -1,3 +1,4 @@
+.vs
 __tests__/runner/*
 
 # comment out in distribution branches
