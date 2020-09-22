@@ -8,12 +8,14 @@ import AzureMySqlActionHelper from '../src/AzureMySqlActionHelper';
 import MySqlConnectionStringBuilder from '../src/MySqlConnectionStringBuilder';
 import FirewallManager from '../src/FirewallManager';
 import AzureMySqlResourceManager from '../src/AzureMySqlResourceManager';
+import MySqlUtils from '../src/MySqlUtils';
 
 jest.mock('@actions/core');
 jest.mock('azure-actions-webclient/AuthorizerFactory');
 jest.mock('../src/AzureMySqlAction');
 jest.mock('../src/FirewallManager');
 jest.mock('../src/AzureMySqlResourceManager');
+
 jest.mock('../src/MySqlConnectionStringBuilder', () => {
     return jest.fn().mockImplementation(() => {
         return {
@@ -42,18 +44,22 @@ describe('main.ts tests', () => {
         let actionExecuteSpy = jest.spyOn(AzureMySqlAction.prototype, 'execute');
         let removeFirewallRuleSpy = jest.spyOn(FirewallManager.prototype, 'removeFirewallRule');
         let setFailedSpy = jest.spyOn(core, 'setFailed');
+        let detectIPAddressSpy = MySqlUtils.detectIPAddress = jest.fn().mockImplementationOnce(() => {
+            return "";
+        });
 
         await run();
 
         expect(AzureMySqlAction).toHaveBeenCalled();
-        expect(getAuthorizerSpy).toHaveBeenCalled();
+        expect(detectIPAddressSpy).toHaveBeenCalled();
+        expect(getAuthorizerSpy).not.toHaveBeenCalled();
         expect(getInputSpy).toHaveBeenCalledTimes(4);
-        expect(getResourceManagerSpy).toHaveBeenCalled();
+        expect(getResourceManagerSpy).not.toHaveBeenCalled();
         expect(MySqlConnectionStringBuilder).toHaveBeenCalled();
         expect(resolveFilePathSpy).toHaveBeenCalled();
-        expect(addFirewallRuleSpy).toHaveBeenCalled();
-        expect(actionExecuteSpy).toHaveBeenCalled();    
-        expect(removeFirewallRuleSpy).toHaveBeenCalled();    
+        expect(addFirewallRuleSpy).not.toHaveBeenCalled();
+        expect(actionExecuteSpy).toHaveBeenCalled();  
+        expect(removeFirewallRuleSpy).not.toHaveBeenCalled();    
         expect(setFailedSpy).not.toHaveBeenCalled();
     })
 
@@ -76,10 +82,14 @@ describe('main.ts tests', () => {
         let actionExecuteSpy = jest.spyOn(AzureMySqlAction.prototype, 'execute');
         let removeFirewallRuleSpy = jest.spyOn(FirewallManager.prototype, 'removeFirewallRule');
         let setFaledSpy = jest.spyOn(core, 'setFailed');
+        let detectIPAddressSpy = MySqlUtils.detectIPAddress = jest.fn().mockImplementationOnce(() => {
+            return "";
+        });
 
         await run();
 
         expect(AzureMySqlAction).not.toHaveBeenCalled();
+        expect(detectIPAddressSpy).not.toHaveBeenCalled();
         expect(getAuthorizerSpy).not.toHaveBeenCalled();
         expect(addFirewallRuleSpy).not.toHaveBeenCalled();
         expect(actionExecuteSpy).not.toHaveBeenCalled();    
@@ -110,10 +120,14 @@ describe('main.ts tests', () => {
         let actionExecuteSpy = jest.spyOn(AzureMySqlAction.prototype, 'execute');
         let removeFirewallRuleSpy = jest.spyOn(FirewallManager.prototype, 'removeFirewallRule');
         let setFaledSpy = jest.spyOn(core, 'setFailed');
+        let detectIPAddressSpy = MySqlUtils.detectIPAddress = jest.fn().mockImplementationOnce(() => {
+            return "";
+        });
 
         await run();
 
         expect(AzureMySqlAction).not.toHaveBeenCalled();
+        expect(detectIPAddressSpy).not.toHaveBeenCalled();
         expect(getAuthorizerSpy).not.toHaveBeenCalled();
         expect(addFirewallRuleSpy).not.toHaveBeenCalled();
         expect(actionExecuteSpy).not.toHaveBeenCalled();    
@@ -123,5 +137,45 @@ describe('main.ts tests', () => {
         expect(resolveFilePathSpy).toHaveBeenCalled();
         expect(MySqlConnectionStringBuilder).toHaveBeenCalled();
         expect(setFaledSpy).toHaveBeenCalledWith('Invalid sql file path provided as input ./testsqlfile.random'); 
-    })
+    });
+
+    it('add firewall rule when its not already configured', async () => {
+        let getInputSpy = jest.spyOn(core, 'getInput').mockImplementation((name, options): string => {
+            switch(name) {
+                case 'server-name': return 'testmysqlserver.mysql.database.azure.com';
+                case 'connection-string': return 'testmysqlserver.mysql.database.azure.com; Port=3306; Database=testdb; Uid=testuser@testmysqlserver; Pwd=testpassword; SslMode=Preferred';
+                case 'sql-file': return './testsqlfile.sql';
+                case 'arguments': return '-t 10';
+            }
+
+            return '';
+        });
+
+        let resolveFilePathSpy = jest.spyOn(AzureMySqlActionHelper, 'resolveFilePath').mockReturnValue('./testsqlfile.sql');
+        let getResourceManagerSpy = jest.spyOn(AzureMySqlResourceManager, 'getResourceManager');
+        let getAuthorizerSpy = jest.spyOn(AuthorizerFactory, 'getAuthorizer');
+        let addFirewallRuleSpy = jest.spyOn(FirewallManager.prototype, 'addFirewallRule');
+        let actionExecuteSpy = jest.spyOn(AzureMySqlAction.prototype, 'execute');
+        let removeFirewallRuleSpy = jest.spyOn(FirewallManager.prototype, 'removeFirewallRule');
+        let setFailedSpy = jest.spyOn(core, 'setFailed');
+        let detectIPAddressSpy = MySqlUtils.detectIPAddress = jest.fn().mockImplementationOnce(() => {
+            return "1.2.3.4";
+        });
+
+        await run();
+
+        expect(AzureMySqlAction).toHaveBeenCalled();
+        expect(detectIPAddressSpy).toHaveBeenCalled();
+        expect(getAuthorizerSpy).toHaveBeenCalled();
+        expect(getInputSpy).toHaveBeenCalledTimes(4);
+        expect(getResourceManagerSpy).toHaveBeenCalled();
+        expect(MySqlConnectionStringBuilder).toHaveBeenCalled();
+        expect(resolveFilePathSpy).toHaveBeenCalled();
+        expect(addFirewallRuleSpy).toHaveBeenCalled();
+        expect(actionExecuteSpy).toHaveBeenCalled();  
+        expect(removeFirewallRuleSpy).toHaveBeenCalled();    
+        expect(setFailedSpy).not.toHaveBeenCalled(); 
+    });
+
+
 })
