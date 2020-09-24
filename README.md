@@ -59,6 +59,7 @@ Follow the steps to configure the secret:
   }
   
 ```
+Please refer [SqlConnection.ConnectionString](https://docs.microsoft.com/en-us/dotnet/api/system.data.sqlclient.sqlconnection.connectionstring?redirectedfrom=MSDN&view=dotnet-plat-ext-3.1#remarks) for handling special characters in connection string.
  
 ### Sample workflow to deploy to an Azure database for MySQL server
 
