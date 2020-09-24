@@ -38,6 +38,7 @@ For using any sensitive data/secrets like Azure Service Principal or MySQL Conne
 Follow the steps to configure the secret:
   * Define a new secret under your repository **Settings** > **Secrets** > **Add a new secret** menu
   * Paste the contents of the Secret (Example: Connection String) as Value
+  * Also, copy the connection string from Azure MySQL DB which is under **Connection strings > ADO.NET** and of the format: Server={your_server}; Port=3306; Database={your_database}; Uid={your_user}; Pwd={your_password}; SslMode=Preferred;
   * For Azure credentials, paste the output of the below [az cli](https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest) command as the value of secret variable, for example 'AZURE_CREDENTIALS'
 ```bash  
 
@@ -58,6 +59,7 @@ Follow the steps to configure the secret:
   }
   
 ```
+Please refer [ConnectionString properties](https://docs.microsoft.com/dotnet/api/system.data.sqlclient.sqlconnection.connectionstring?redirectedfrom=MSDN&view=dotnet-plat-ext-3.1#remarks) for handling special characters in connection string.
  
 ### Sample workflow to deploy to an Azure database for MySQL server
 
