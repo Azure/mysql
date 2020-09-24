@@ -38,6 +38,7 @@ For using any sensitive data/secrets like Azure Service Principal or MySQL Conne
 Follow the steps to configure the secret:
   * Define a new secret under your repository **Settings** > **Secrets** > **Add a new secret** menu
   * Paste the contents of the Secret (Example: Connection String) as Value
+  * Also, copy the connection string from Azure MySQL DB which is under Connection strings > ADO.NET and of the format: Server=ak-mysql-db.mysql.database.azure.com; Port=3306; Database={your_database}; Uid=aksm@ak-mysql-db; Pwd={your_password}; SslMode=Preferred;
   * For Azure credentials, paste the output of the below [az cli](https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest) command as the value of secret variable, for example 'AZURE_CREDENTIALS'
 ```bash  
 
