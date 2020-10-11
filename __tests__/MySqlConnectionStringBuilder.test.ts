@@ -22,6 +22,20 @@ describe('MySqlConnectionStringBuilder tests', () => {
         });
     })
 
+    describe('validate no database specified', () => {
+        let validConnectionStrings = [
+            [`Server=testserver;User Id=user;Password=JustANormal123@#$password;`, 'validates values no db specified', `JustANormal123@#$password`]
+        ];
+    
+        it.each(validConnectionStrings)('Input `%s` %s', (connectionStringInput, testDescription, passwordOutput) => {
+            let connectionString = new MySqlConnectionStringBuilder(connectionStringInput);
+    
+            expect(connectionString.connectionString).toMatch(connectionStringInput);
+            expect(connectionString.password).toMatch(passwordOutput);
+            expect(connectionString.userId).toMatch(`user`);
+        });
+    })
+
     describe('throw for invalid connection strings', () => {
         let invalidConnectionStrings = [
             [`Server=testserver;User Id=user;Password="ab'=abcdf''c;123;Database=testdb`, 'validates values beginning with double quotes but not ending with double quotes'],
