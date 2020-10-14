@@ -113,8 +113,8 @@ export default class MySqlConnectionStringBuilder {
             }
         }
 
-        if (!parsedConnectionString.server || !parsedConnectionString.userId || !parsedConnectionString.password || !parsedConnectionString.database) {
-            throw new Error(`Missing required keys in connection string. Please ensure that the keys 'Server', 'User Id', 'Password', 'Database' are provided in the connection string.`);
+        if (!parsedConnectionString.server || !parsedConnectionString.userId || !parsedConnectionString.password) {
+            throw new Error(`Missing required keys in connection string. Please ensure that the keys 'Server', 'User Id', 'Password' are provided in the connection string.`);
         }
 
         return parsedConnectionString;
