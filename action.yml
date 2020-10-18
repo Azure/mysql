@@ -5,8 +5,17 @@ inputs:
     description: 'Server name of Azure DB for Mysql. Example: fabrikam.mysql.database.azure.com. When you connect using Mysql Workbench, this is the same value that is used for Hostname in Parameters'
     required: true
   connection-string:
-    description: 'The connection string, including authentication information, for the Azure MySQL Server.'
-    required: true
+    description: 'The connection string, including authentication information, for the Azure MySQL Server. (deprecated)'
+    required: false
+  username:
+    description: 'Azure MySQL Server username for login'
+    required: false
+  password:
+      description: 'Azure MySQL Server password for login'
+      required: false
+  database:
+    description: 'Azure MySQL Server database (optional) to connect to. No database will be used automatically.'
+    required: false    
   sql-file:
     description: 'Path to SQL script file, *.sql to deploy'
     required: true
