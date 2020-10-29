@@ -3,7 +3,7 @@ import AzureMySqlActionHelper from '../src/AzureMySqlActionHelper';
 import MySqlConnectionStringBuilder from '../src/MySqlConnectionStringBuilder';
 import AzureMySqlAction, { IActionInputs } from '../src/AzureMySqlAction';
 
-describe('AzureMySqlAction tests', () => {
+describe('AzureMySqlAction.ng tests', () => {
     it('executes sql file on target database', async () => {
 
         let inputs = getInputs();
@@ -70,7 +70,12 @@ describe('AzureMySqlAction tests', () => {
 function getInputs() {
     return {
         serverName: 'testmysqlserver.mysql.database.azure.com',
-        connectionString: new MySqlConnectionStringBuilder('Server=testmysqlserver.mysql.database.azure.com; Port=3306; Database=testdb; Uid=testuser@testmysqlserver; Pwd=testpassword; SslMode=Preferred'),
+        connectionString: {
+            server: 'testmysqlserver.mysql.database.azure.com',
+            userId: 'testuser@testmysqlserver',
+            password: 'testpassword',
+            database: 'testdb'
+        },
         sqlFile: './testsqlfile.sql',
         additionalArguments: '-t 10'
     } as IActionInputs;
@@ -79,7 +84,11 @@ function getInputs() {
 function getInputsNoDatabase() {
     return {
         serverName: 'testmysqlserver.mysql.database.azure.com',
-        connectionString: new MySqlConnectionStringBuilder('Server=testmysqlserver.mysql.database.azure.com; Port=3306; Uid=testuser@testmysqlserver; Pwd=testpassword; SslMode=Preferred'),
+        connectionString: {
+            server: 'testmysqlserver.mysql.database.azure.com',
+            userId: 'testuser@testmysqlserver',
+            password: 'testpassword'
+        },
         sqlFile: './testsqlfile.sql',
         additionalArguments: '-t 10'
     } as IActionInputs;

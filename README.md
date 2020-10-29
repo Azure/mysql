@@ -12,9 +12,17 @@ If you are looking for more Github Actions to deploy code or a customized image 
 
 The definition of this Github Action is in [action.yml](https://github.com/Azure/mysql/blob/master/action.yml).
 
-# End-to-End Sample Workflow
+## Passing MySQL authentication parameters
 
-## Dependencies on other Github Actions
+The action supports two methods of passing authentication parameters, using a connection string (deprecated), which you can pass with a single parameter the server, user name, password and (optionally) the database you want to connect to, a connection string is easily obtained from the Azure Portal.
+
+The second method (which we recommend) is to pass the username, password (and optionally) the database as individual parameters.
+
+Connecton string parameter is kept for backward compatability, not to break any existing workflows when passing authentication settings as individual parameters were introduced. 
+
+## End-to-End Sample Workflow
+
+### Dependencies on other Github Actions
 
 * Authenticate using [Azure Login](https://github.com/Azure/login)
 
@@ -26,19 +34,22 @@ However, this auto-provisioning of firewall rules needs a pre-req that the workf
 
 Alternatively, if enough permissions are not granted on the service principal or login action is not included, then the firewall rules have to be explicitly managed by user using CLI/PS scripts.
 
-## Create an Azure database for MySQL server and deploy using GitHub Actions
+### Create an Azure database for MySQL server and deploy using GitHub Actions
+
 1. Follow the tutorial [Azure Database for MySQL server Quickstart](https://docs.microsoft.com/en-us/azure/mysql/quickstart-create-mysql-server-database-using-azure-portal)
 2. Copy the MySQL-on-Azure.yml template from [starter templates](https://github.com/Azure/actions-workflow-samples/tree/master/Database) and paste the template contents into `.github/workflows/` within your project repository as workflow.yml.
 3. Change `server-name` to your Azure MySQL Server name.
 4. Commit and push your project to GitHub repository, you should see a new GitHub Action initiated in **Actions** tab.
 
 ## Configure GitHub Secrets with Azure Credentials and MySQL Connection Strings
+
 For using any sensitive data/secrets like Azure Service Principal or MySQL Connection strings within an Action, add them as [secrets](https://help.github.com/en/github/automating-your-workflow-with-github-actions/virtual-environments-for-github-actions#creating-and-using-secrets-encrypted-variables) in the GitHub repository and then use them in the workflow.
 
 Follow the steps to configure the secret:
   * Define a new secret under your repository **Settings** > **Secrets** > **Add a new secret** menu
-  * Paste the contents of the Secret (Example: Connection String) as Value
-  * Also, copy the connection string from Azure MySQL DB which is under **Connection strings > ADO.NET** and of the format: ```Server={your_server}; Port=3306; Database={your_database}; Uid={your_user}; Pwd={your_password}; SslMode=Preferred;```(Database is optional)
+  * Paste the contents of the Secret (Example: Either the **password** or **Connection String**) as Value. Paste the database user password or **If** you wish to use the connection string:
+    * Copy the connection string from Azure MySQL DB which is under **Connection strings > ADO.NET** and of the format: ```Server={your_server}; Port=3306; Database={your_database}; Uid={your_user}; Pwd={your_password}; SslMode=Preferred;```(Database is optional)
+    
   * For Azure credentials, paste the output of the below [az cli](https://docs.microsoft.com/en-us/cli/azure/?view=azure-cli-latest) command as the value of secret variable, for example 'AZURE_CREDENTIALS'
 ```bash  
 
@@ -59,9 +70,12 @@ Follow the steps to configure the secret:
   }
   
 ```
-Please refer [ConnectionString properties](https://docs.microsoft.com/dotnet/api/system.data.sqlclient.sqlconnection.connectionstring?redirectedfrom=MSDN&view=dotnet-plat-ext-3.1#remarks) for handling special characters in connection string.
+
+> If you want to use the connection string, please refer [ConnectionString properties](https://docs.microsoft.com/dotnet/api/system.data.sqlclient.sqlconnection.connectionstring?redirectedfrom=MSDN&view=dotnet-plat-ext-3.1#remarks) for handling special characters in connection string.
  
-### Sample workflow to deploy to an Azure database for MySQL server
+#### Sample workflow to deploy to an Azure database for MySQL server
+
+##### Using a connection string (deprecated)
 
 ```yaml
 # .github/workflows/mysql-deploy.yml
@@ -82,8 +96,31 @@ jobs:
         sql-file: './sqlFile.sql'
  ```
 
+##### Using individual parameters (recommended)
 
-# Contributing
+```yaml
+# .github/workflows/mysql-deploy.yml
+on: [push]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v1
+    - uses: azure/login@v1
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
+    - uses: azure/mysql@v1
+      with:
+        server-name: REPLACE_THIS_WITH_YOUR_MYSQL_SERVER_NAME
+        username: admin@REPLACE_THIS_WITH_YOUR_MYSQL_SERVER_NAME
+        password: ${{ secrets.AZURE_MYSQL_PASSWORD }}
+        # This is optional, you want to connect directly
+        database: REPLACE_WITH_DATABASE_NAME
+        sql-file: './sqlFile.sql'
+ ```
+
+## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
