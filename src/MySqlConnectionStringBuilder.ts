@@ -20,24 +20,18 @@
     where KeyValueRegex = ([\w\s]+=(?:('[^']*(''[^']*)*')|("[^"]*(""[^"]*)*")|((?!['"])[^;]*))))
 */
 import * as core from '@actions/core';
+import { MySqlConnectionString } from './MySqlConnectionString';
 
 const connectionStringParserRegex = /(?<key>[\w\s]+)=(?<val>('[^']*(''[^']*)*')|("[^"]*(""[^"]*)*")|((?!['"])[^;]*))/g 
 const connectionStringTester = /^[;\s]*([\w\s]+=(?:('[^']*(''[^']*)*')|("[^"]*(""[^"]*)*")|((?!['"])[^;]*)))(;[;\s]*([\w\s]+=(?:('[^']*(''[^']*)*')|("[^"]*(""[^"]*)*")|((?!['"])[^;]*))))*[;\s]*$/
 
-export interface MySqlConnectionString {
-    server: string;
-    userId: string;
-    password: string;
-    database: string;
-}
-
-export default class MySqlConnectionStringBuilder {
+export default class MySqlConnectionStringBuilder implements MySqlConnectionString {
     constructor(connectionString: string) {
         this._connectionString = connectionString;
         this._validateConnectionString();
         this._parsedConnectionString = this._parseConnectionString();
     }
-    
+
     public get connectionString(): string {
         return this._connectionString;
     }
@@ -54,7 +48,7 @@ export default class MySqlConnectionStringBuilder {
         return this._parsedConnectionString.server;
     }
 
-    public get database(): string {
+    public get database(): string | null | undefined {
         return this._parsedConnectionString.database;
     }
 
