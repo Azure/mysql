@@ -1,11 +1,12 @@
 import * as core from '@actions/core';
 import * as exec from '@actions/exec';
 import AzureMySqlActionHelper from './AzureMySqlActionHelper';
+import { MySqlConnectionString } from './MySqlConnectionString';
 import MySqlConnectionStringBuilder from './MySqlConnectionStringBuilder';
 
 export interface IActionInputs {
     serverName: string;
-    connectionString: MySqlConnectionStringBuilder;
+    connectionString: MySqlConnectionString;
     sqlFile: string;
     additionalArguments: string;
 }
