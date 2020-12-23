@@ -120,6 +120,8 @@ jobs:
         sql-file: './sqlFile.sql'
  ```
 
+Azure MySQL Action for GitHub is supported on 'AzureUSGovernment'.Login to the respective Azure Cloud before running MySQL Action for GitHub using [Azure Login](https://github.com/Azure/login)
+
 ## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
