@@ -17,7 +17,7 @@ inputs:
     description: 'Azure MySQL Server database (optional) to connect to. No database will be used automatically.'
     required: false    
   sql-file:
-    description: 'Path to SQL script file, *.sql to deploy'
+    description: 'Path to SQL script file to deploy'
     required: true
   arguments:
     description: 'Additional options supported by mysql simple SQL shell. These options will be applied when executing the given file on the Azure DB for Mysql.'
