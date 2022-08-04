@@ -9,7 +9,7 @@ import FirewallManager from '../src/FirewallManager';
 jest.mock('azure-actions-webclient/AzureRestClient');
 
 describe('AzureMySqlResourceManager tests', () => {
-    it('initializes resource manager correctly', async () => {
+    it('initializes resource manager correctly for single server', async () => {
         let getRequestUrlSpy = jest.spyOn(AzureRestClient.prototype, 'getRequestUri').mockReturnValue('https://randomUrl/');
         let beginRequestSpy = jest.spyOn(AzureRestClient.prototype, 'beginRequest').mockResolvedValue({
             statusCode: 200,
@@ -33,24 +33,40 @@ describe('AzureMySqlResourceManager tests', () => {
         let server = resourceManager.getMySqlServer();
 
         expect(server!.name).toEqual('testServer');
+        expect(server!.id).toEqual('/subscriptions/SubscriptionId/resourceGroups/testrg/providers/Microsoft.DBforMySQL/servers/testServer');
         expect(getRequestUrlSpy).toHaveBeenCalledTimes(1);
         expect(beginRequestSpy).toHaveBeenCalledTimes(1);
+    });
 
-    })
-
-    it('throws if resource manager fails to initialize', async () => {
+    it('initializes resource manager correctly for flexible server', async () => {
         let getRequestUrlSpy = jest.spyOn(AzureRestClient.prototype, 'getRequestUri').mockReturnValue('https://randomUrl/');
-        let beginRequestSpy = jest.spyOn(AzureRestClient.prototype, 'beginRequest').mockResolvedValue({
+        let beginRequestSpy = jest.spyOn(AzureRestClient.prototype, 'beginRequest').mockResolvedValueOnce({
             statusCode: 200,
             body: {
                 value: [
                     {
-                        name: 'testServer1',
-                        id: '/subscriptions/SubscriptionId/resourceGroups/testrg/providers/Microsoft.sql/servers/testServer'
+                        name: 'testServer',
+                        id: '/subscriptions/SubscriptionId/resourceGroups/testrg/providers/Microsoft.DBforMySQL/servers/testServer'
                     },
                     {
                         name: 'testServer2',
-                        id: '/subscriptions/SubscriptionId/resourceGroups/testrg/providers/Microsoft.sql/servers/testServer2'
+                        id: '/subscriptions/SubscriptionId/resourceGroups/testrg/providers/Microsoft.DBforMySQL/servers/testServer2'
+                    }
+                ]
+            },
+            statusMessage: 'OK',
+            headers: []
+        }).mockResolvedValueOnce({
+            statusCode: 200,
+            body: {
+                value: [
+                    {
+                        name: 'testServer3',
+                        id: '/subscriptions/SubscriptionId/resourceGroups/testrg/providers/Microsoft.DBforMySQL/servers/testServer3'
+                    },
+                    {
+                        name: 'testServer4',
+                        id: '/subscriptions/SubscriptionId/resourceGroups/testrg/providers/Microsoft.DBforMySQL/servers/testServer4'
                     }
                 ]
             },
@@ -58,11 +74,60 @@ describe('AzureMySqlResourceManager tests', () => {
             headers: []
         });
 
-        let expectedError = `Unable to get details of MySQL server testServer. MySql server 'testServer' was not found in the subscription.`;
-        expect(AzureMySqlResourceManager.getResourceManager('testServer', {} as IAuthorizer)).rejects.toThrowError(new Error(expectedError));
-        expect(getRequestUrlSpy).toHaveBeenCalledTimes(1);
-        expect(beginRequestSpy).toHaveBeenCalledTimes(1);
+        let resourceManager = await AzureMySqlResourceManager.getResourceManager('testServer3', {} as IAuthorizer);
+        let server = resourceManager.getMySqlServer();
+
+        expect(server!.name).toEqual('testServer3');
+        expect(server!.id).toEqual('/subscriptions/SubscriptionId/resourceGroups/testrg/providers/Microsoft.DBforMySQL/servers/testServer3');
+        expect(getRequestUrlSpy).toHaveBeenCalledTimes(2);
+        expect(beginRequestSpy).toHaveBeenCalledTimes(2);
     })
+
+    it('throws if resource manager fails to initialize', async () => {
+        let getRequestUrlSpy = jest.spyOn(AzureRestClient.prototype, 'getRequestUri').mockReturnValue('https://randomUrl/');
+        let beginRequestSpy = jest.spyOn(AzureRestClient.prototype, 'beginRequest').mockResolvedValueOnce({
+            statusCode: 200,
+            body: {
+                value: [
+                    {
+                        name: 'testServer1',
+                        id: '/subscriptions/SubscriptionId/resourceGroups/testrg/providers/Microsoft.DBforMySQL/servers/testServer1'
+                    },
+                    {
+                        name: 'testServer2',
+                        id: '/subscriptions/SubscriptionId/resourceGroups/testrg/providers/Microsoft.DBforMySQL/servers/testServer2'
+                    }
+                ]
+            },
+            statusMessage: 'OK',
+            headers: []
+        }).mockResolvedValueOnce({
+            statusCode: 200,
+            body: {
+                value: [
+                    {
+                        name: 'testServer3',
+                        id: '/subscriptions/SubscriptionId/resourceGroups/testrg/providers/Microsoft.DBforMySQL/flexibleServers/testServer3'
+                    },
+                    {
+                        name: 'testServer4',
+                        id: '/subscriptions/SubscriptionId/resourceGroups/testrg/providers/Microsoft.DBforMySQL/flexibleServers/testServer4'
+                    }
+                ]
+            },
+            statusMessage: 'OK',
+            headers: []
+        });
+
+        let expectedError = `Unable to get details of MySQL server testServer. MySQL server 'testServer' was not found in the subscription.`;
+        try {
+            await AzureMySqlResourceManager.getResourceManager('testServer', {} as IAuthorizer);
+        } catch(error) {
+            expect(error.message).toEqual(expectedError);
+        }
+        expect(getRequestUrlSpy).toHaveBeenCalledTimes(2);
+        expect(beginRequestSpy).toHaveBeenCalledTimes(2);
+    });
 
     it('adds firewall rule successfully', async () => {
         let getRequestUrlSpy = jest.spyOn(AzureRestClient.prototype, 'getRequestUri').mockReturnValue('https://randomUrl/');
@@ -108,7 +173,7 @@ describe('AzureMySqlResourceManager tests', () => {
         expect(getRequestUrlSpy).toHaveBeenCalledTimes(2);
         expect(beginRequestSpy).toHaveBeenCalledTimes(3);
         expect(getFirewallRuleSpy).toHaveBeenCalledTimes(1);
-    })
+    });
 
     it('removes firewall rule successfully', async () => {
         let getRequestUrlSpy = jest.spyOn(AzureRestClient.prototype, 'getRequestUri').mockReturnValue('https://randomUrl/');
@@ -149,5 +214,5 @@ describe('AzureMySqlResourceManager tests', () => {
 
         expect(getRequestUrlSpy).toHaveBeenCalledTimes(2);
         expect(beginRequestSpy).toHaveBeenCalledTimes(3);
-    })
+    });
 })

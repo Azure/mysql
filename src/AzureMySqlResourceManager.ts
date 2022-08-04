@@ -65,7 +65,7 @@ export default class AzureMySqlResourceManager {
         let firewallRuleName = `ClientIPAddress_${Date.now()}`;
         let httpRequest: WebRequest = {
             method: 'PUT',
-            uri: this._restClient.getRequestUri(`/${this._resource!.id}/firewallRules/${firewallRuleName}`, {}, [], '2017-12-01'),
+            uri: this._restClient.getRequestUri(`/${this._resource!.id}/firewallRules/${firewallRuleName}`, {}, [], this._apiVersion),
             body: JSON.stringify({
                 'properties': {
                     'startIpAddress': startIpAddress,
@@ -104,7 +104,7 @@ export default class AzureMySqlResourceManager {
     public async removeFirewallRule(firewallRule: FirewallRule): Promise<void> {
         let httpRequest: WebRequest = {
             method: 'DELETE',
-            uri: this._restClient.getRequestUri(`/${this._resource!.id}/firewallRules/${firewallRule.name}`, {}, [], '2017-12-01')
+            uri: this._restClient.getRequestUri(`/${this._resource!.id}/firewallRules/${firewallRule.name}`, {}, [], this._apiVersion)
         };
 
         try {
@@ -134,7 +134,7 @@ export default class AzureMySqlResourceManager {
     public async getFirewallRule(ruleName: string): Promise<FirewallRule> {
         let httpRequest: WebRequest = {
             method: 'GET',
-            uri: this._restClient.getRequestUri(`/${this._resource!.id}/firewallRules/${ruleName}`, {}, [], '2017-12-01')
+            uri: this._restClient.getRequestUri(`/${this._resource!.id}/firewallRules/${ruleName}`, {}, [], this._apiVersion)
         };
 
         try {
@@ -185,40 +185,46 @@ export default class AzureMySqlResourceManager {
         return response;
     }
 
-    private async _populateMySqlServerData(serverName: string) {
-        // trim the cloud hostname suffix from servername
-        serverName = serverName.split('.')[0];
-        let httpRequest: WebRequest = {
+    private async _getMySqlServer(serverType: string, apiVersion: string, serverName: string) {
+        const httpRequest: WebRequest = {
             method: 'GET',
-            uri: this._restClient.getRequestUri('//subscriptions/{subscriptionId}/providers/Microsoft.DBforMySQL/servers', {}, [], '2017-12-01')
+            uri: this._restClient.getRequestUri(`//subscriptions/{subscriptionId}/providers/Microsoft.DBforMySQL/${serverType}`, {}, [], apiVersion)
         }
 
-        core.debug(`Get MySQL server '${serverName}' details`);
+        core.debug(`Get '${serverName}' for MySQL ${serverType} details`);
         try {
-            let httpResponse = await this._restClient.beginRequest(httpRequest);
+            const httpResponse = await this._restClient.beginRequest(httpRequest);
             if (httpResponse.statusCode !== 200) {
                 throw ToError(httpResponse);
             }
 
-            let sqlServers = httpResponse.body && httpResponse.body.value as AzureMySqlServer[];
-            if (sqlServers && sqlServers.length > 0) {
-                this._resource = sqlServers.filter((sqlResource) => sqlResource.name.toLowerCase() === serverName.toLowerCase())[0];
-                if (!this._resource) {
-                    throw new Error(`Unable to get details of MySQL server ${serverName}. MySql server '${serverName}' was not found in the subscription.`);
-                }
+            const sqlServers = ((httpResponse.body && httpResponse.body.value) || []) as AzureMySqlServer[];
+            const sqlServer = sqlServers.find((sqlResource) => sqlResource.name.toLowerCase() === serverName.toLowerCase());
+            if (sqlServer) {
+                this._serverType = serverType;
+                this._apiVersion = apiVersion;
+                this._resource = sqlServer;
+                return true;
+            }
 
-                core.debug(JSON.stringify(this._resource));
-            }
-            else {
-                throw new Error(`Unable to get details of MySQL server ${serverName}. No MySQL servers were found in the subscription.`);
-            }
+            return false;
         }
         catch(error) {
             if (error instanceof AzureError) {
                 throw new Error(JSON.stringify(error));
             }
-            
+
             throw error;
+        }
+    }
+
+    private async _populateMySqlServerData(serverName: string) {
+        // trim the cloud hostname suffix from servername
+        serverName = serverName.split('.')[0];
+        
+        (await this._getMySqlServer('servers', '2017-12-01', serverName)) || (await this._getMySqlServer('flexibleServers', '2021-05-01', serverName));
+        if (!this._resource) {
+            throw new Error(`Unable to get details of MySQL server ${serverName}. MySQL server '${serverName}' was not found in the subscription.`);
         }
     }
 
@@ -228,6 +234,8 @@ export default class AzureMySqlResourceManager {
         });
     }
 
+    private _serverType?: string;
+    private _apiVersion?: string;
     private _resource?: AzureMySqlServer;
     private _restClient: AzureRestClient;
 }
