@@ -10,9 +10,10 @@ export default class MySqlUtils {
         let mySqlError = '';
 
         try {
+            const command = `"${mySqlClientPath}" -h ${serverName} -u "${connectionString.userId}" -e "show databases" --connect-timeout 10`;
             core.debug(`Validating if client has access to MySql Server '${serverName}'.`);
-            core.debug(`"${mySqlClientPath}" -h ${serverName} -u "${connectionString.userId}" -e "show databases"`);
-            await exec.exec(`"${mySqlClientPath}" -h ${serverName} -u "${connectionString.userId}" -e "show databases"`, [], {
+            core.debug(command);
+            await exec.exec(command, [], {
                 silent: true,
                 listeners: {
                     stderr: (data: Buffer) => mySqlError += data.toString()
