@@ -21,6 +21,7 @@ inputs:
     required: true
   arguments:
     description: 'Additional options supported by mysql simple SQL shell. These options will be applied when executing the given file on the Azure DB for Mysql.'
+    required: false
 runs:
   using: 'node12'
   main: 'lib/main.js'
