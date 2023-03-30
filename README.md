@@ -4,7 +4,7 @@ With the Azure MySQL Action for GitHub, you can automate your workflow to deploy
 
 Get started today with a [free Azure account](https://azure.com/free/open-source)!
 
-This repository contains GitHub Action for [Azure database for MySQL server](https://github.com/Azure/mysql) to deploy . 
+This repository contains GitHub Action for [Azure Database for MySQL server](https://github.com/Azure/mysql) to deploy . 
 
 The action uses Connection String for authentication and SQL scripts to deploy to your MySQL database.
 
@@ -26,7 +26,7 @@ Connecton string parameter is kept for backward compatability, not to break any 
 
 * Authenticate using [Azure Login](https://github.com/Azure/login)
 
-For the action to run, the IP Address of the GitHub Action runner (automation agent) must be added to the 'Allowed IP Addresses' by setting [MySQL server firewall rules](https://docs.microsoft.com/en-us/azure/mysql/howto-manage-firewall-using-portal) in Azure.  Without the firewall rules, the runner cannot communicate with Azure database for MySQL.
+For the action to run, the IP Address of the GitHub Action runner (automation agent) must be added to the 'Allowed IP Addresses' by setting [MySQL server firewall rules](https://docs.microsoft.com/en-us/azure/mysql/howto-manage-firewall-using-portal) in Azure.  Without the firewall rules, the runner cannot communicate with Azure Database for MySQL.
 
 By default, the action would auto-detect the IP Address of the runner to automatically add firewall exception rule. These firewall rules will be deleted after the action executes.
 
@@ -34,7 +34,7 @@ However, this auto-provisioning of firewall rules needs a pre-req that the workf
 
 Alternatively, if enough permissions are not granted on the service principal or login action is not included, then the firewall rules have to be explicitly managed by user using CLI/PS scripts.
 
-### Create an Azure database for MySQL server and deploy using GitHub Actions
+### Create an Azure Database for MySQL server and deploy using GitHub Actions
 
 1. Follow the tutorial [Azure Database for MySQL server Quickstart](https://docs.microsoft.com/en-us/azure/mysql/quickstart-create-mysql-server-database-using-azure-portal)
 2. Copy the MySQL-on-Azure.yml template from [starter templates](https://github.com/Azure/actions-workflow-samples/tree/master/Database) and paste the template contents into `.github/workflows/` within your project repository as workflow.yml.
@@ -73,7 +73,7 @@ Follow the steps to configure the secret:
 
 > If you want to use the connection string, please refer [ConnectionString properties](https://docs.microsoft.com/dotnet/api/system.data.sqlclient.sqlconnection.connectionstring?redirectedfrom=MSDN&view=dotnet-plat-ext-3.1#remarks) for handling special characters in connection string.
  
-#### Sample workflow to deploy to an Azure database for MySQL server
+#### Sample workflow to deploy to an Azure Database for MySQL server
 
 ##### Using a connection string (deprecated)
 
