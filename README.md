@@ -26,7 +26,7 @@ Connecton string parameter is kept for backward compatability, not to break any 
 
 * Authenticate using [Azure Login](https://github.com/Azure/login)
 
-For the action to run, the IP Address of the GitHub Action runner (automation agent) must be added to the 'Allowed IP Addresses' by setting [MySQL server firewall rules](https://docs.microsoft.com/en-us/azure/mysql/howto-manage-firewall-using-portal) in Azure.  Without the firewall rules, the runner cannot communicate with Azure database for MySQL.
+For the action to run, the IP Address of the GitHub Actions Runner (automation agent) must be added to the 'Allowed IP Addresses' by setting [MySQL server firewall rules](https://docs.microsoft.com/en-us/azure/mysql/howto-manage-firewall-using-portal) in Azure.  Without the firewall rules, the runner cannot communicate with Azure database for MySQL.
 
 By default, the action would auto-detect the IP Address of the runner to automatically add firewall exception rule. These firewall rules will be deleted after the action executes.
 
