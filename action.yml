@@ -1,4 +1,4 @@
-name: 'Azure MYSQL Deploy'
+name: 'Azure MySQL Deploy'
 description: 'Deploy to Azure MySQL database using SQL script files'
 inputs:
   server-name: 
